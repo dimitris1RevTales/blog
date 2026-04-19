@@ -6,10 +6,13 @@ python -m http.server --directory docs/occupancy-vanity-metric 8080
 
 if it does not work, fix with: `touch docs/.nojekyll`
 
-commit to github with:
-git add <the pytho file> docs/.
-git commit -m 'some comment'
-git push origin main
+commit to github with:<br>
+`git add .`<br>
+`git commit -m 'some comment'`<br>
+`git push origin main`<br>
 
 deployed at:
 https://dimitris1revtales.github.io/blog/occupancy-vanity-metric/
+
+Official url:
+https://blog.revenuetales.com/occupancy-vanity-metric/
