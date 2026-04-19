@@ -10,3 +10,6 @@ commit to github with:
 git add <the pytho file> docs/.
 git commit -m 'some comment'
 git push origin main
+
+deployed at:
+https://dimitris1revtales.github.io/blog/occupancy-vanity-metric/
