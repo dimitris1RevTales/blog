@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__executeCode",
+      "Bash(python:*)",
+      "Bash(jupyter nbconvert:*)",
+      "Bash(pip install:*)",
+      "WebSearch",
+      "Bash(ruff check:*)",
+      "Bash(marimo run:*)",
+      "Bash(curl -s http://localhost:2718)",
+      "Bash(taskkill /F /FI \"WINDOWTITLE eq *marimo*\")",
+      "Bash(pkill -f \"marimo run\")",
+      "Skill(marimo-pair)",
+      "Bash(bash:*)",
+      "Bash(marimo edit:*)",
+      "Bash(curl -s http://localhost:2720)",
+      "Bash(grep -r \"marimo\" requirements.txt)",
+      "Bash(pip show:*)",
+      "WebFetch(domain:docs.marimo.io)",
+      "Bash(marimo export:*)",
+      "WebFetch(domain:dimitris1revtales.github.io)"
+    ]
+  }
+}

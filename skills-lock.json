@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "marimo-pair": {
+      "source": "marimo-team/marimo-pair",
+      "sourceType": "github",
+      "computedHash": "9e66972813e524975332ab2460c7a5d373704de8a95e2af5eac669d9750d73c9"
+    },
+    "writing-linkedin-posts": {
+      "source": "jamesgray007/hoai-course",
+      "sourceType": "github",
+      "computedHash": "907d4a4e6c128e925be84e708046fd95fc648dc3278acf4ffa077064a5d8c5dd"
+    }
+  }
+}
