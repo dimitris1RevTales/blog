@@ -9,8 +9,10 @@ A small publishing platform for **interactive marimo notebooks accompanying Link
 ## Repository Structure
 
 - `interactive_simulation.py` — **Example notebook.** Reactive marimo notebook with `mo.ui` controls, preset scenarios, and matplotlib charts. No `plt.savefig()` calls (WASM-compatible). Copy its structure when adding new notebooks.
-- `docs/<slug>/` — One folder per published notebook, holding the marimo-WASM-exported static site (treat as a build artifact: `index.html` + bundled `assets/` + favicons/manifest). Current: `docs/occupancy-vanity-metric/`.
+- `docs/<slug>/` — One folder per published notebook, holding the marimo-WASM-exported static site (treat as a build artifact: `index.html` + bundled `assets/` + favicons/manifest). Current slugs: `docs/occupancy-vanity-metric/`, `docs/last-mile-pricing/`.
+- `docs/index.html` — Hand-maintained blog home page (cards link to each published slug). Update when publishing a new notebook.
 - `docs/CNAME` — Custom-domain config for GitHub Pages (`blog.revenuetales.com`).
+- `scripts/inject_ga.py` — Idempotent injector that stamps the GA4 tag (`G-P32PX685T9`) into a given `index.html` before `</head>`. Must be re-run after every `marimo export html-wasm` (marimo overwrites `index.html` and strips the tag). See "Google Analytics (GA4)" below.
 - `.agents/skills/` and `.claude/skills/` — Skill definitions (`brainstorming`, `linkedin-post-maker`, `marimo-pair`, `writing-linkedin-posts`). Pinned via `skills-lock.json`.
 - `README.md` — Short command cheat sheet for the export-and-deploy loop.
 
@@ -30,8 +32,9 @@ marimo edit interactive_simulation.py
 Rebuild the WASM site (replace `<notebook>.py` and `<slug>` when publishing a new notebook):
 ```bash
 marimo export html-wasm <notebook>.py -o docs/<slug> --mode run -f
+python scripts/inject_ga.py docs/<slug>/index.html
 ```
-`--mode run` hides the code and shows only outputs/UI (the LinkedIn-reader view). Use `--mode edit` if you want the reader to see and tweak code in the browser.
+`--mode run` hides the code and shows only outputs/UI (the LinkedIn-reader view). Use `--mode edit` if you want the reader to see and tweak code in the browser. The `inject_ga.py` step adds the GA4 tag (`G-P32PX685T9`, shared with `revenuetales.com`) — **required after every re-export**, because marimo overwrites `index.html` and strips the tag. The script is idempotent; safe to re-run.
 
 Test the exported site locally:
 ```bash
@@ -40,6 +43,52 @@ python -m http.server --directory docs/occupancy-vanity-metric 8080
 ```
 
 If Jekyll swallows a file after push, `touch docs/.nojekyll` and recommit.
+
+### Google Analytics (GA4)
+
+**Every page under `blog.revenuetales.com` MUST carry the GA4 tag `G-P32PX685T9`** (same property as the main site, so GA sees one user journey across `revenuetales.com` ↔ `blog.revenuetales.com`). The Measurement ID is hardcoded inside `scripts/inject_ga.py` — do not change it without confirming with the user.
+
+Currently tagged:
+
+- `docs/index.html` — blog home (hand-maintained; the injected `<!-- GA4 (gtag.js) -->` block persists across edits).
+- `docs/occupancy-vanity-metric/index.html` — marimo export; tag is **stripped on every re-export**.
+- `docs/last-mile-pricing/index.html` — marimo export; tag is **stripped on every re-export**.
+
+#### Publishing a new marimo notebook — GA checklist
+
+Any new post `docs/<slug>/index.html` is also a marimo export and will ship untagged unless you explicitly inject. So when adding a new post:
+
+1. Export the notebook: `marimo export html-wasm <notebook>.py -o docs/<slug> --mode run -f`.
+2. **Inject GA immediately**: `python scripts/inject_ga.py docs/<slug>/index.html`.
+3. Verify: `grep -c "G-P32PX685T9" docs/<slug>/index.html` should print `2` (once in the script `src`, once in the `gtag('config', ...)` call).
+4. **Update CLAUDE.md's "Currently tagged" list above** to include the new path, so future LLMs see the full set.
+5. **Update the bulk re-inject command below** to include the new path.
+
+#### Re-inject after any marimo re-export
+
+Single file (most common after editing one notebook):
+```bash
+python scripts/inject_ga.py docs/<slug>/index.html
+```
+
+Reapply to all tagged pages (use after any batch re-export; update this list when you publish a new slug):
+```bash
+python scripts/inject_ga.py \
+  docs/index.html \
+  docs/occupancy-vanity-metric/index.html \
+  docs/last-mile-pricing/index.html
+```
+
+The script is idempotent — rerunning on an already-tagged file prints `skip (already injected)` and is a no-op. It matches on the `<!-- GA4 (gtag.js) -->` marker, so never hand-edit that comment away.
+
+#### Verification
+
+- Devtools → Network tab on the deployed page: you should see a request to `googletagmanager.com/gtag/js?id=G-P32PX685T9` and one to `google-analytics.com/g/collect…`.
+- `analytics.google.com` → property "Revenue Tales" → Reports → **Realtime** should show your session within ~30s of a visit.
+
+#### Consent banner
+
+None installed — analytics fires unconditionally. If an EU-compliance need arises, wire a banner that blocks `gtag('config', ...)` until the user accepts. Do not add a banner pre-emptively without the user asking; it degrades UX for the current (mostly LinkedIn-referred) audience.
 
 Deployment is GitHub Pages off `main`: `git push origin main` publishes. URLs:
 - `https://dimitris1revtales.github.io/blog/occupancy-vanity-metric/`
@@ -93,6 +142,7 @@ Notebooks run client-side in Pyodide, not on a server. That changes what you can
 - Run `marimo check --fix <notebook>.py` to catch formatting and DAG issues.
 - Click through every preset and exercise sliders at extremes — WASM will surface any divide-by-zero or unhandled edge case as an in-page traceback.
 - Open the exported `docs/<slug>/index.html` via the local `http.server` command above and load it in a clean browser tab; first-time WASM bootstrap is what real readers will see.
+- **Run `python scripts/inject_ga.py docs/<slug>/index.html`** after the export (marimo overwrites `index.html` and strips the GA tag). Then `grep -c "G-P32PX685T9" docs/<slug>/index.html` must return `2`. See "Google Analytics (GA4)" above.
 
 ## Simulation Parameters
 

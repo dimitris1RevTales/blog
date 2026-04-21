@@ -129,7 +129,15 @@
       header.site h1 { font-size: 1.75rem; }
     }
   </style>
-</head>
+    <!-- GA4 (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P32PX685T9"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-P32PX685T9');
+    </script>
+  </head>
 <body>
   <div class="wrap">
     <header class="site">
@@ -140,12 +148,23 @@
     <main>
       <section class="posts">
         <article class="card">
+          <a href="last-mile-pricing/">
+            <img src="last-mile-pricing/cover.png" alt="Bar chart comparing total revenue from three last-mile pricing strategies: hold, stepped, and crash — stepped wins" />
+            <div class="card-body">
+              <h2>The Cost of Waiting Too Long</h2>
+              <p class="desc">Every unsold room disappears at midnight. Compare three last-mile strategies — hold, stepped discount, and crash — and see why stepped usually wins, and when it doesn't.</p>
+              <p class="meta"><time datetime="2026-04-20">April 20, 2026</time> &middot; Interactive notebook</p>
+            </div>
+          </a>
+        </article>
+
+        <article class="card">
           <a href="occupancy-vanity-metric/">
             <img src="occupancy-vanity-metric/cover.png" alt="Waterfall chart showing how revenue of EUR 288,000 is reduced by variable, channel, and fixed costs" />
             <div class="card-body">
               <h2>Occupancy Is a Vanity Metric</h2>
               <p class="desc">95% occupancy sounds impressive — until you see the hotel at 80% making more profit. An interactive simulation of why fewer rooms at a higher rate often beats a full house at a discount.</p>
-              <p class="meta">Interactive notebook</p>
+              <p class="meta"><time datetime="2026-04-19">April 19, 2026</time> &middot; Interactive notebook</p>
             </div>
           </a>
         </article>
@@ -153,8 +172,7 @@
     </main>
 
     <footer class="site">
-      <span>&copy; Revenue Tales</span>
-      <a href="https://github.com/dimitris1RevTales/blog" rel="noopener">GitHub</a>
+      <span><a href="https://revenuetales.com" rel="noopener">&copy; RevenueTales</a></span>
     </footer>
   </div>
 </body>
