@@ -3,130 +3,194 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Revenue Tales</title>
-  <meta name="description" content="Interactive essays on hotel revenue, pricing, and the math behind busy-fool strategies." />
+  <title>Blog | Revenue Tales</title>
+  <meta name="description" content="Essays and interactive notebooks on hotel revenue, pricing, and the math behind busy-fool strategies." />
 
-  <link rel="icon" href="occupancy-vanity-metric/favicon.ico" />
-  <link rel="icon" type="image/png" sizes="32x32" href="occupancy-vanity-metric/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="occupancy-vanity-metric/favicon-16x16.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="occupancy-vanity-metric/apple-touch-icon.png" />
+  <!-- favicon: revenuetales -->
+  <link rel="icon" type="image/png" sizes="32x32" href="https://revenuetales.com/wp-content/uploads/cropped-favicon-1-32x32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="https://revenuetales.com/wp-content/uploads/cropped-favicon-1-192x192.png" />
+  <link rel="apple-touch-icon" sizes="270x270" href="https://revenuetales.com/wp-content/uploads/cropped-favicon-1-270x270.png" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Revenue Tales" />
-  <meta property="og:description" content="Interactive essays on hotel revenue, pricing, and the math behind busy-fool strategies." />
+  <meta property="og:title" content="Blog | Revenue Tales" />
+  <meta property="og:description" content="Essays and interactive notebooks on hotel revenue, pricing, and the math behind busy-fool strategies." />
   <meta property="og:image" content="https://blog.revenuetales.com/occupancy-vanity-metric/cover-og.png" />
   <meta property="og:url" content="https://blog.revenuetales.com/" />
   <meta name="twitter:card" content="summary_large_image" />
 
   <style>
+    :root {
+      --ink:        #1f3256;
+      --ink-soft:   #2a3f63;
+      --muted:      #8a8f99;
+      --accent:     #c48a5b;
+      --rule:       #e6e6e6;
+      --bg:         #ffffff;
+    }
+
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      font-size: 17px;
+      font-size: 16px;
       line-height: 1.6;
-      color: #1a1a1a;
-      background: #ffffff;
+      color: var(--ink);
+      background: var(--bg);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
     a { color: inherit; text-decoration: none; }
 
-    .wrap {
-      max-width: 1100px;
+    /* Top nav — matches revenuetales.com style */
+    nav.top {
+      border-bottom: 1px solid var(--rule);
+    }
+    nav.top .inner {
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 64px 24px 96px;
+      padding: 22px 40px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 0.95rem;
+    }
+    nav.top a {
+      color: var(--muted);
+      transition: color 0.15s ease;
+    }
+    nav.top a:hover { color: var(--ink); }
+    nav.top a.current {
+      color: var(--ink);
+      font-weight: 600;
+    }
+    nav.top .dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--muted);
+      display: inline-block;
     }
 
-    header.site {
-      border-bottom: 1px solid #eaeaea;
-      padding-bottom: 32px;
-      margin-bottom: 48px;
-    }
-    header.site h1 {
-      margin: 0 0 8px;
-      font-size: 2.25rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    header.site p {
-      margin: 0;
-      color: #555;
-      font-size: 1.05rem;
+    main.wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 96px 40px 96px;
     }
 
     .posts {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 28px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: auto;
+      column-gap: 32px;
+      row-gap: 40px;
     }
 
-    .card {
+    /* Each card is a subgrid so image/title/date/hr/excerpt rows
+       align across all cards in the same row. */
+    .post {
+      display: grid;
+      grid-template-rows: subgrid;
+      grid-row: span 5;
+      row-gap: 0;
       background: #fff;
-      border: 1px solid #eaeaea;
-      border-radius: 12px;
+      border: 1px solid var(--rule);
+      border-radius: 14px;
       overflow: hidden;
       transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
     }
-    .card:hover {
+    .post:hover {
       transform: translateY(-3px);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.08);
       border-color: #d8d8d8;
     }
-    .card a {
-      display: block;
-      height: 100%;
-    }
-    .card img {
+    /* Lift the whole anchor out of layout so children occupy the
+       card's subgrid rows directly. */
+    .post > a { display: contents; }
+    .post:hover .post-img { opacity: 0.94; }
+    .post:hover h2 { color: var(--accent); }
+
+    .post-img {
       display: block;
       width: 100%;
-      aspect-ratio: 488 / 342;
-      object-fit: contain;
-      background: #ffffff;
-      border-bottom: 1px solid #eaeaea;
-      padding: 8px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      background: #f5f5f5;
+      transition: opacity 0.2s ease;
     }
-    .card-body {
-      padding: 20px 22px 24px;
+
+    .post h2 {
+      margin: 22px 24px 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      line-height: 1.35;
+      letter-spacing: -0.005em;
+      color: var(--ink);
+      transition: color 0.15s ease;
+      align-self: start;
     }
-    .card-body h2 {
-      margin: 0 0 10px;
-      font-size: 1.25rem;
-      font-weight: 650;
-      letter-spacing: -0.01em;
-      line-height: 1.3;
-    }
-    .card-body .desc {
-      margin: 0 0 14px;
-      color: #444;
-      font-size: 0.98rem;
-      line-height: 1.55;
-    }
-    .card-body .meta {
-      margin: 0;
-      color: #888;
-      font-size: 0.82rem;
+
+    .post .date {
+      margin: 0 24px 16px;
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.1em;
+      align-self: start;
+    }
+
+    .post hr {
+      border: 0;
+      border-top: 1px solid var(--rule);
+      margin: 0 24px 16px;
+      align-self: start;
+      width: calc(100% - 48px);
+    }
+
+    .post .excerpt {
+      margin: 0 24px 24px;
+      color: var(--ink-soft);
+      font-size: 0.94rem;
+      line-height: 1.6;
+      align-self: start;
+    }
+
+    /* Fallback for browsers without subgrid: equal-height cards via
+       flex, with min-heights on title/excerpt to approximate alignment. */
+    @supports not (grid-template-rows: subgrid) {
+      .post {
+        display: flex;
+        flex-direction: column;
+      }
+      .post > a { display: flex; flex-direction: column; height: 100%; }
+      .post h2 { min-height: 2.7em; }
+      .post .excerpt { flex: 1 1 auto; }
     }
 
     footer.site {
-      margin-top: 80px;
-      padding-top: 28px;
-      border-top: 1px solid #eaeaea;
-      color: #888;
-      font-size: 0.88rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 40px 48px;
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: 0.85rem;
       display: flex;
       flex-wrap: wrap;
       gap: 12px 24px;
       justify-content: space-between;
     }
-    footer.site a:hover { color: #1a1a1a; }
+    footer.site a:hover { color: var(--ink); }
 
-    @media (max-width: 520px) {
-      .wrap { padding: 40px 18px 64px; }
-      header.site h1 { font-size: 1.75rem; }
+    @media (max-width: 960px) {
+      .posts { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; row-gap: 32px; }
+      main.wrap { padding: 72px 32px 72px; }
+    }
+    @media (max-width: 620px) {
+      .posts { grid-template-columns: 1fr; row-gap: 28px; }
+      nav.top .inner { padding: 18px 24px; }
+      main.wrap { padding: 48px 24px 64px; }
+      footer.site { padding: 32px 24px 40px; }
     }
   </style>
     <!-- GA4 (gtag.js) -->
@@ -139,41 +203,52 @@
     </script>
   </head>
 <body>
-  <div class="wrap">
-    <header class="site">
-      <h1>Revenue Tales</h1>
-      <p>Interactive essays on hotel revenue, pricing, and the math behind busy-fool strategies.</p>
-    </header>
+  <nav class="top">
+    <div class="inner">
+      <a href="https://revenuetales.com/">Home</a>
+      <span class="dot" aria-hidden="true"></span>
+      <a href="/" class="current">Blog</a>
+    </div>
+  </nav>
 
-    <main>
-      <section class="posts">
-        <article class="card">
-          <a href="last-mile-pricing/">
-            <img src="last-mile-pricing/cover.png" alt="Bar chart comparing total revenue from three last-mile pricing strategies: hold, stepped, and crash — stepped wins" />
-            <div class="card-body">
-              <h2>The Cost of Waiting Too Long</h2>
-              <p class="desc">Every unsold room disappears at midnight. Compare three last-mile strategies — hold, stepped discount, and crash — and see why stepped usually wins, and when it doesn't.</p>
-              <p class="meta"><time datetime="2026-04-20">April 20, 2026</time> &middot; Interactive notebook</p>
-            </div>
-          </a>
-        </article>
+  <main class="wrap">
+    <section class="posts">
 
-        <article class="card">
-          <a href="occupancy-vanity-metric/">
-            <img src="occupancy-vanity-metric/cover.png" alt="Waterfall chart showing how revenue of EUR 288,000 is reduced by variable, channel, and fixed costs" />
-            <div class="card-body">
-              <h2>Occupancy Is a Vanity Metric</h2>
-              <p class="desc">95% occupancy sounds impressive — until you see the hotel at 80% making more profit. An interactive simulation of why fewer rooms at a higher rate often beats a full house at a discount.</p>
-              <p class="meta"><time datetime="2026-04-19">April 19, 2026</time> &middot; Interactive notebook</p>
-            </div>
-          </a>
-        </article>
-      </section>
-    </main>
+      <article class="post">
+        <a href="last-mile-pricing/">
+          <img class="post-img" src="last-mile-pricing/thumb.png" alt="Bar chart comparing cost of three last-mile pricing strategies: Hold EUR 450, Stepped EUR 719, Crash EUR 640" />
+          <h2>The Cost of Waiting Too Long</h2>
+          <p class="date">30 April 2026</p>
+          <hr />
+          <p class="excerpt">Every unsold room disappears at midnight. Compare three last-mile strategies &mdash; hold, stepped discount, and crash &mdash; and see why stepped usually wins, and when it&nbsp;doesn&rsquo;t.</p>
+        </a>
+      </article>
 
-    <footer class="site">
-      <span><a href="https://revenuetales.com" rel="noopener">&copy; RevenueTales</a></span>
-    </footer>
-  </div>
+      <article class="post">
+        <a href="occupancy-vanity-metric/">
+          <img class="post-img" src="occupancy-vanity-metric/thumb.png" alt="Waterfall chart titled 'How Hotel Revenue Becomes Profit': EUR 288,000 revenue minus EUR 84,000 variable, EUR 28,800 channel, and EUR 60,000 fixed costs leaves EUR 115,200 net profit" />
+          <h2>Occupancy Is a Vanity Metric</h2>
+          <p class="date">19 April 2026</p>
+          <hr />
+          <p class="excerpt">95% occupancy sounds impressive &mdash; until you see the hotel at 80% making more profit. An interactive simulation of why fewer rooms at a higher rate often beats a full house at a&nbsp;discount.</p>
+        </a>
+      </article>
+
+      <article class="post">
+        <a href="https://revenuetales.com/blog/why-manual-pricing-is-holding-hotels-back/" rel="noopener">
+          <img class="post-img" src="manual-pricing/cover.jpg" alt="Black and white photo of a hotel revenue manager at a desk, head bowed, with hand-drawn charts covering the wall behind him" />
+          <h2>Why Manual Pricing Is Holding Hotels Back</h2>
+          <p class="date">19 February 2026</p>
+          <hr />
+          <p class="excerpt">We will explore what is the cost of doing things the usual and familiar way. A confronting question to ask is one that is hard to answer: &ldquo;How much revenue does my hotel leave on&nbsp;&hellip;</p>
+        </a>
+      </article>
+
+    </section>
+  </main>
+
+  <footer class="site">
+    <span><a href="https://revenuetales.com" rel="noopener">&copy; RevenueTales</a></span>
+  </footer>
 </body>
 </html>
