@@ -292,5 +292,51 @@
             "runtimeConfig": null,
         };
     </script>
+      <!-- hide marimo badge -->
+    <style>
+      a[href*="marimo.io"],
+      a[href*="marimo.app"],
+      [class*="marimo-badge"],
+      [data-marimo-badge] {
+        display: none !important;
+      }
+    </style>
+    <script>
+      (function () {
+        var TEXT_RE = /^\s*made with\s+marimo\s*$/i;
+        function hideIn(root) {
+          if (!root || !root.querySelectorAll) return;
+          var links = root.querySelectorAll('a');
+          for (var i = 0; i < links.length; i++) {
+            var a = links[i];
+            var href = (a.getAttribute('href') || '').toLowerCase();
+            var text = (a.textContent || '').trim();
+            if (
+              href.indexOf('marimo.io') !== -1 ||
+              href.indexOf('marimo.app') !== -1 ||
+              TEXT_RE.test(text)
+            ) {
+              a.style.display = 'none';
+            }
+          }
+          var all = root.querySelectorAll('*');
+          for (var j = 0; j < all.length; j++) {
+            var el = all[j];
+            if (el.shadowRoot) hideIn(el.shadowRoot);
+          }
+        }
+        function sweep() { hideIn(document); }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', sweep);
+        } else {
+          sweep();
+        }
+        setTimeout(sweep, 2000);
+        try {
+          var mo = new MutationObserver(function () { sweep(); });
+          mo.observe(document.documentElement, { childList: true, subtree: true });
+        } catch (e) {}
+      })();
+    </script>
   </body>
 </html>

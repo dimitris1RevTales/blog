@@ -9,10 +9,11 @@ A small publishing platform for **interactive marimo notebooks accompanying Link
 ## Repository Structure
 
 - `interactive_simulation.py` — **Example notebook.** Reactive marimo notebook with `mo.ui` controls, preset scenarios, and matplotlib charts. No `plt.savefig()` calls (WASM-compatible). Copy its structure when adding new notebooks.
-- `docs/<slug>/` — One folder per published notebook, holding the marimo-WASM-exported static site (treat as a build artifact: `index.html` + bundled `assets/` + favicons/manifest). Current slugs: `docs/occupancy-vanity-metric/`, `docs/last-mile-pricing/`.
+- `docs/<slug>/` — One folder per published notebook, holding the marimo-WASM-exported static site (treat as a build artifact: `index.html` + bundled `assets/` + favicons/manifest). Current slugs: `docs/occupancy-vanity-metric/`, `docs/last-mile-pricing/`, `docs/smart-allocator/`.
 - `docs/index.html` — Hand-maintained blog home page (cards link to each published slug). Update when publishing a new notebook.
 - `docs/CNAME` — Custom-domain config for GitHub Pages (`blog.revenuetales.com`).
 - `scripts/inject_ga.py` — Idempotent injector that stamps the GA4 tag (`G-P32PX685T9`) into a given `index.html` before `</head>`. Must be re-run after every `marimo export html-wasm` (marimo overwrites `index.html` and strips the tag). See "Google Analytics (GA4)" below.
+- `scripts/hide_marimo_badge.py` — Idempotent injector that stamps a CSS + MutationObserver block before `</body>` to suppress the "Made with Marimo" badge marimo renders in the bottom-right corner. Must be re-run after every `marimo export html-wasm` (marimo overwrites `index.html` and the badge returns). See "Post-export checklist" below.
 - `.agents/skills/` and `.claude/skills/` — Skill definitions (`brainstorming`, `linkedin-post-maker`, `marimo-pair`, `writing-linkedin-posts`). Pinned via `skills-lock.json`.
 - `README.md` — Short command cheat sheet for the export-and-deploy loop.
 
@@ -33,8 +34,9 @@ Rebuild the WASM site (replace `<notebook>.py` and `<slug>` when publishing a ne
 ```bash
 marimo export html-wasm <notebook>.py -o docs/<slug> --mode run -f
 python scripts/inject_ga.py docs/<slug>/index.html
+python scripts/hide_marimo_badge.py docs/<slug>/index.html
 ```
-`--mode run` hides the code and shows only outputs/UI (the LinkedIn-reader view). Use `--mode edit` if you want the reader to see and tweak code in the browser. The `inject_ga.py` step adds the GA4 tag (`G-P32PX685T9`, shared with `revenuetales.com`) — **required after every re-export**, because marimo overwrites `index.html` and strips the tag. The script is idempotent; safe to re-run.
+`--mode run` hides the code and shows only outputs/UI (the LinkedIn-reader view). Use `--mode edit` if you want the reader to see and tweak code in the browser. The `inject_ga.py` step adds the GA4 tag (`G-P32PX685T9`, shared with `revenuetales.com`) — **required after every re-export**, because marimo overwrites `index.html` and strips the tag. The `hide_marimo_badge.py` step injects CSS + a MutationObserver that suppresses the "Made with Marimo" badge marimo renders at runtime; marimo overwrites `index.html` on every re-export and re-adds the badge, so re-run this script each time. Both scripts are idempotent; safe to re-run.
 
 Test the exported site locally:
 ```bash
@@ -53,22 +55,26 @@ Currently tagged:
 - `docs/index.html` — blog home (hand-maintained; the injected `<!-- GA4 (gtag.js) -->` block persists across edits).
 - `docs/occupancy-vanity-metric/index.html` — marimo export; tag is **stripped on every re-export**.
 - `docs/last-mile-pricing/index.html` — marimo export; tag is **stripped on every re-export**.
+- `docs/smart-allocator/index.html` — marimo export; tag is **stripped on every re-export**.
 
-#### Publishing a new marimo notebook — GA checklist
+#### Publishing a new marimo notebook — post-export checklist
 
-Any new post `docs/<slug>/index.html` is also a marimo export and will ship untagged unless you explicitly inject. So when adding a new post:
+Any new post `docs/<slug>/index.html` is also a marimo export and will ship untagged (and with the Marimo badge) unless you explicitly inject. So when adding a new post:
 
 1. Export the notebook: `marimo export html-wasm <notebook>.py -o docs/<slug> --mode run -f`.
 2. **Inject GA immediately**: `python scripts/inject_ga.py docs/<slug>/index.html`.
-3. Verify: `grep -c "G-P32PX685T9" docs/<slug>/index.html` should print `2` (once in the script `src`, once in the `gtag('config', ...)` call).
-4. **Update CLAUDE.md's "Currently tagged" list above** to include the new path, so future LLMs see the full set.
-5. **Update the bulk re-inject command below** to include the new path.
+3. **Hide the Marimo badge**: `python scripts/hide_marimo_badge.py docs/<slug>/index.html`.
+4. Verify GA: `grep -c "G-P32PX685T9" docs/<slug>/index.html` should print `2` (once in the script `src`, once in the `gtag('config', ...)` call).
+5. Verify badge-hide: `grep -c "hide marimo badge" docs/<slug>/index.html` should print `1`.
+6. **Update CLAUDE.md's "Currently tagged" list above** to include the new path, so future LLMs see the full set.
+7. **Update the bulk re-inject command below** to include the new path.
 
 #### Re-inject after any marimo re-export
 
 Single file (most common after editing one notebook):
 ```bash
 python scripts/inject_ga.py docs/<slug>/index.html
+python scripts/hide_marimo_badge.py docs/<slug>/index.html
 ```
 
 Reapply to all tagged pages (use after any batch re-export; update this list when you publish a new slug):
@@ -76,10 +82,18 @@ Reapply to all tagged pages (use after any batch re-export; update this list whe
 python scripts/inject_ga.py \
   docs/index.html \
   docs/occupancy-vanity-metric/index.html \
-  docs/last-mile-pricing/index.html
+  docs/last-mile-pricing/index.html \
+  docs/smart-allocator/index.html
+
+python scripts/hide_marimo_badge.py \
+  docs/occupancy-vanity-metric/index.html \
+  docs/last-mile-pricing/index.html \
+  docs/smart-allocator/index.html
 ```
 
-The script is idempotent — rerunning on an already-tagged file prints `skip (already injected)` and is a no-op. It matches on the `<!-- GA4 (gtag.js) -->` marker, so never hand-edit that comment away.
+(`hide_marimo_badge.py` is not run against `docs/index.html` — the hand-maintained blog home has no Marimo badge.)
+
+Both scripts are idempotent — rerunning on an already-processed file prints `skip (already injected)` and is a no-op. They match on `<!-- GA4 (gtag.js) -->` and `<!-- hide marimo badge -->` markers respectively, so never hand-edit those comments away.
 
 #### Verification
 
@@ -143,6 +157,7 @@ Notebooks run client-side in Pyodide, not on a server. That changes what you can
 - Click through every preset and exercise sliders at extremes — WASM will surface any divide-by-zero or unhandled edge case as an in-page traceback.
 - Open the exported `docs/<slug>/index.html` via the local `http.server` command above and load it in a clean browser tab; first-time WASM bootstrap is what real readers will see.
 - **Run `python scripts/inject_ga.py docs/<slug>/index.html`** after the export (marimo overwrites `index.html` and strips the GA tag). Then `grep -c "G-P32PX685T9" docs/<slug>/index.html` must return `2`. See "Google Analytics (GA4)" above.
+- **Run `python scripts/hide_marimo_badge.py docs/<slug>/index.html`** after the export to suppress the "Made with Marimo" badge (marimo re-adds it on every re-export). Then `grep -c "hide marimo badge" docs/<slug>/index.html` must return `1`.
 
 ## Simulation Parameters
 
