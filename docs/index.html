@@ -168,20 +168,6 @@
       .post .excerpt { flex: 1 1 auto; }
     }
 
-    footer.site {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 40px 48px;
-      border-top: 1px solid var(--rule);
-      color: var(--muted);
-      font-size: 0.85rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px 24px;
-      justify-content: space-between;
-    }
-    footer.site a:hover { color: var(--ink); }
-
     @media (max-width: 960px) {
       .posts { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; row-gap: 32px; }
       main.wrap { padding: 72px 32px 72px; }
@@ -190,7 +176,6 @@
       .posts { grid-template-columns: 1fr; row-gap: 28px; }
       nav.top .inner { padding: 18px 24px; }
       main.wrap { padding: 48px 24px 64px; }
-      footer.site { padding: 32px 24px 40px; }
     }
   </style>
     <!-- GA4 (gtag.js) -->
@@ -246,9 +231,5 @@
 
     </section>
   </main>
-
-  <footer class="site">
-    <span><a href="https://revenuetales.com" rel="noopener">&copy; RevenueTales</a></span>
-  </footer>
 </body>
 </html>
